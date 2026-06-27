@@ -151,14 +151,8 @@ const FOOTER = () => (
 
 // ─── Template: Classic ───────────────────────────────────────────
 function ClassicLayout({ state, fmt, totals }: TplProps) {
-  const fromDetails = [
-    state.fromAddress,
-    [state.fromEmail, state.fromPhone, state.fromWebsite].filter(Boolean).join('  ·  '),
-  ].filter(Boolean).join('\n');
-  const toDetails = [
-    state.toAddress,
-    [state.toEmail, state.toPhone].filter(Boolean).join('  ·  '),
-  ].filter(Boolean).join('\n');
+  const fromDetails = [state.fromAddress, state.fromEmail, state.fromPhone, state.fromWebsite].filter(Boolean).join('\n');
+  const toDetails = [state.toAddress, state.toEmail, state.toPhone].filter(Boolean).join('\n');
   return (
     <>
       <div className="inv-header">
@@ -207,14 +201,8 @@ function ClassicLayout({ state, fmt, totals }: TplProps) {
 
 // ─── Template: Modern (full-width accent header) ─────────────────
 function ModernLayout({ state, fmt, totals }: TplProps) {
-  const fromDetails = [
-    state.fromAddress,
-    [state.fromEmail, state.fromPhone, state.fromWebsite].filter(Boolean).join('  ·  '),
-  ].filter(Boolean).join('\n');
-  const toDetails = [
-    state.toAddress,
-    [state.toEmail, state.toPhone].filter(Boolean).join('  ·  '),
-  ].filter(Boolean).join('\n');
+  const fromDetails = [state.fromAddress, state.fromEmail, state.fromPhone, state.fromWebsite].filter(Boolean).join('\n');
+  const toDetails = [state.toAddress, state.toEmail, state.toPhone].filter(Boolean).join('\n');
   return (
     <>
       <div className="mod-header">
@@ -259,15 +247,8 @@ function ModernLayout({ state, fmt, totals }: TplProps) {
 
 // ─── Template: Bold (accent sidebar left) ────────────────────────
 function BoldLayout({ state, fmt, totals }: TplProps) {
-  const fromDetails = [
-    state.fromAddress,
-    [state.fromEmail, state.fromPhone].filter(Boolean).join('\n'),
-    state.fromWebsite,
-  ].filter(Boolean).join('\n');
-  const toDetails = [
-    state.toAddress,
-    [state.toEmail, state.toPhone].filter(Boolean).join('  ·  '),
-  ].filter(Boolean).join('\n');
+  const fromDetails = [state.fromAddress, state.fromEmail, state.fromPhone, state.fromWebsite].filter(Boolean).join('\n');
+  const toDetails = [state.toAddress, state.toEmail, state.toPhone].filter(Boolean).join('\n');
   return (
     <>
       <div className="bold-sidebar">
@@ -328,14 +309,8 @@ function BoldLayout({ state, fmt, totals }: TplProps) {
 
 // ─── Template: Minimal (clean typographic) ───────────────────────
 function MinimalLayout({ state, fmt, totals }: TplProps) {
-  const fromDetails = [
-    state.fromAddress,
-    [state.fromEmail, state.fromPhone, state.fromWebsite].filter(Boolean).join('  ·  '),
-  ].filter(Boolean).join('\n');
-  const toDetails = [
-    state.toAddress,
-    [state.toEmail, state.toPhone].filter(Boolean).join('  ·  '),
-  ].filter(Boolean).join('\n');
+  const fromDetails = [state.fromAddress, state.fromEmail, state.fromPhone, state.fromWebsite].filter(Boolean).join('\n');
+  const toDetails = [state.toAddress, state.toEmail, state.toPhone].filter(Boolean).join('\n');
   return (
     <>
       <div className="min-header">
