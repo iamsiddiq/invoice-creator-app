@@ -1,0 +1,189 @@
+'use client';
+
+import { useState, useRef, useCallback } from 'react';
+import Navbar from './Navbar';
+import FormPanel from './FormPanel';
+import InvoicePreview from './InvoicePreview';
+import type { InvoiceState, LineItem } from '@/lib/types';
+import { formatDateInput, generateInvoiceNumber } from '@/lib/utils';
+
+function getDefaultState(): InvoiceState {
+  const today = new Date();
+  const due = new Date(today);
+  due.setDate(due.getDate() + 30);
+  return {
+    fromName: '', fromAddress: '', fromEmail: '', fromPhone: '', fromWebsite: '',
+    logoDataUrl: null,
+    toName: '', toAddress: '', toEmail: '', toPhone: '',
+    invoiceNumber: generateInvoiceNumber(today),
+    invoiceDate: formatDateInput(today),
+    dueDate: formatDateInput(due),
+    poNumber: '',
+    currency: 'USD',
+    items: [{ id: 1, desc: '', qty: 1, rate: 0 }],
+    discountType: 'percent', discountValue: 0,
+    taxType: 'percent', taxValue: 0,
+    shippingValue: 0,
+    sgstType: 'percent', sgstValue: 0,
+    cgstType: 'percent', cgstValue: 0,
+    notes: '', terms: '', bankDetails: '',
+    theme: 't-blue',
+    customColor: '#6366F1',
+    template: 'classic',
+  };
+}
+
+export default function InvoiceApp() {
+  const [state, setState] = useState<InvoiceState>(getDefaultState);
+  const [itemCounter, setItemCounter] = useState(1);
+  const [mobilePanel, setMobilePanel] = useState<'form' | 'preview'>('form');
+  const [isGenerating, setIsGenerating] = useState(false);
+  const invoiceRef = useRef<HTMLDivElement>(null);
+
+  const handleChange = useCallback((updates: Partial<InvoiceState>) => {
+    setState(prev => ({ ...prev, ...updates }));
+  }, []);
+
+  const handleAddItem = useCallback(() => {
+    setItemCounter(prev => {
+      const id = prev + 1;
+      setState(s => ({ ...s, items: [...s.items, { id, desc: '', qty: 1, rate: 0 }] }));
+      return id;
+    });
+  }, []);
+
+  const handleRemoveItem = useCallback((id: number) => {
+    setState(prev => ({ ...prev, items: prev.items.filter(i => i.id !== id) }));
+  }, []);
+
+  const handleUpdateItem = useCallback((id: number, field: keyof LineItem, value: string | number) => {
+    setState(prev => ({
+      ...prev,
+      items: prev.items.map(item => item.id === id ? { ...item, [field]: value } : item),
+    }));
+  }, []);
+
+  const downloadPDF = useCallback(async () => {
+    const el = invoiceRef.current;
+    if (!el || isGenerating) return;
+
+    setIsGenerating(true);
+    // Expand to A4 proportional height for the element's actual rendered width, then restore
+    const prevMinHeight = el.style.minHeight;
+    const a4MinHeight = Math.ceil(el.offsetWidth * 297 / 210);
+    el.style.minHeight = `${a4MinHeight}px`;
+    // Hide preview-only placeholders so they don't appear in the PDF
+    const placeholders = el.querySelectorAll<HTMLElement>('.preview-placeholder');
+    placeholders.forEach(p => { p.style.display = 'none'; });
+    try {
+      const html2canvas = (await import('html2canvas')).default;
+      const { jsPDF } = await import('jspdf');
+
+      const canvas = await html2canvas(el, {
+        scale: 2,
+        useCORS: true,
+        backgroundColor: '#ffffff',
+        logging: false,
+      });
+
+      const imgData = canvas.toDataURL('image/jpeg', 0.98);
+
+      // A4 dimensions in mm
+      const PAGE_W = 210;
+      const PAGE_H = 297;
+
+      // Scale image to fill A4 width exactly
+      const imgW = PAGE_W;
+      const imgH = (canvas.height / canvas.width) * PAGE_W;
+
+      const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+
+      // Paginate: slide the image up by PAGE_H on each new page
+      let yOffset = 0;
+      while (yOffset < imgH) {
+        if (yOffset > 0) pdf.addPage();
+        pdf.addImage(imgData, 'JPEG', 0, -yOffset, imgW, imgH);
+        yOffset += PAGE_H;
+      }
+
+      // Add clickable link annotations (html2canvas flattens to image, so links must be re-added)
+      const elRect = el.getBoundingClientRect();
+      const linkScale = PAGE_W / el.offsetWidth;
+      el.querySelectorAll<HTMLAnchorElement>('a[href]').forEach(anchor => {
+        const rect = anchor.getBoundingClientRect();
+        const x = (rect.left - elRect.left) * linkScale;
+        const y = (rect.top - elRect.top) * linkScale;
+        const w = rect.width * linkScale;
+        const h = rect.height * linkScale;
+        const pageNum = Math.floor(y / PAGE_H) + 1;
+        const yOnPage = y - (pageNum - 1) * PAGE_H;
+        if (pageNum >= 1 && pageNum <= pdf.getNumberOfPages()) {
+          pdf.setPage(pageNum);
+          pdf.link(x, yOnPage, w, h, { url: anchor.href });
+        }
+      });
+
+      pdf.save(`Invoice-${state.invoiceNumber || 'document'}.pdf`);
+
+      // Fire-and-forget — DB save never blocks or breaks the PDF download
+      fetch('/api/save-invoice', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(state),
+      }).catch(() => {});
+    } catch (err) {
+      console.error('PDF generation failed:', err);
+      alert('PDF generation failed. Please try again.');
+    } finally {
+      el.style.minHeight = prevMinHeight;
+      placeholders.forEach(p => { p.style.display = ''; });
+      setIsGenerating(false);
+    }
+  }, [isGenerating, state.invoiceNumber]);
+
+  const resetInvoice = useCallback(() => {
+    if (confirm('Clear this invoice and start fresh?')) {
+      setState(getDefaultState());
+      setItemCounter(1);
+    }
+  }, []);
+
+  return (
+    <div className="app">
+      <Navbar
+        onDownload={downloadPDF}
+        onReset={resetInvoice}
+        isGenerating={isGenerating}
+      />
+      <div className="mobile-tab-bar">
+        <button
+          className={mobilePanel === 'form' ? 'active' : ''}
+          onClick={() => setMobilePanel('form')}
+        >
+          Edit
+        </button>
+        <button
+          className={mobilePanel === 'preview' ? 'active' : ''}
+          onClick={() => setMobilePanel('preview')}
+        >
+          Preview
+        </button>
+      </div>
+      <div className="app-body">
+        <FormPanel
+          state={state}
+          onChange={handleChange}
+          onAddItem={handleAddItem}
+          onRemoveItem={handleRemoveItem}
+          onUpdateItem={handleUpdateItem}
+          mobileVisible={mobilePanel === 'form'}
+        />
+        <InvoicePreview
+          ref={invoiceRef}
+          state={state}
+          mobileVisible={mobilePanel === 'preview'}
+        />
+      </div>
+    </div>
+  );
+}

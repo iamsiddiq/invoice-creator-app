@@ -1,0 +1,13 @@
+<svg width="140" height="38" viewBox="0 0 140 38" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <title>MARAV Technologies</title>
+  <defs>
+    <style>@import url('https://fonts.googleapis.com/css2?family=Inter:wght@800&amp;display=swap');</style>
+  </defs>
+  <text
+    x="0" y="30"
+    font-family="'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Arial, sans-serif"
+    font-size="30"
+    font-weight="800"
+    letter-spacing="-0.8"
+    fill="#0A0A14">MARAV<tspan fill="#0057FF">.</tspan></text>
+</svg>
