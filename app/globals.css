@@ -5,8 +5,6 @@ body {
   background: #F0F2F7;
   color: #111118;
   -webkit-font-smoothing: antialiased;
-  height: 100dvh;
-  overflow: hidden;
 }
 input, select, textarea, button { font-family: inherit; }
 img { max-width: 100%; display: block; }
@@ -33,7 +31,7 @@ a { text-decoration: none; color: inherit; }
 }
 
 /* ─── App Shell ──────────────────────────────────────────── */
-.app { display: flex; flex-direction: column; height: 100dvh; }
+.app { display: flex; flex-direction: column; height: 100dvh; overflow: hidden; }
 
 /* ─── Top Nav ────────────────────────────────────────────── */
 .app-nav {
@@ -625,3 +623,139 @@ a { text-decoration: none; color: inherit; }
 .min-grand-total .tl { font-size: 14px; font-weight: 700; color: #111118; }
 .min-grand-total .tv { font-size: 17px; font-weight: 800; color: var(--inv-accent); }
 .min-footer { border-top: 1px solid #F3F4F6; padding: 14px 40px; display: flex; justify-content: center; }
+
+/* ─── Share Banner ───────────────────────────────────────── */
+.share-banner {
+  background: var(--dark-2);
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  padding: 10px 24px;
+  flex-shrink: 0;
+  animation: fadeUp 0.3s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.share-banner-inner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+.share-banner-label {
+  font-size: 13px;
+  color: rgba(255,255,255,0.6);
+  white-space: nowrap;
+  font-weight: 500;
+}
+.share-banner-input {
+  flex: 1;
+  background: rgba(255,255,255,0.07);
+  border: 1px solid rgba(255,255,255,0.12);
+  color: rgba(255,255,255,0.9);
+  border-radius: 7px;
+  padding: 7px 12px;
+  font-size: 13px;
+  min-width: 0;
+  cursor: text;
+  font-family: inherit;
+  outline: none;
+}
+.share-banner-input:focus { border-color: rgba(255,255,255,0.28); }
+.share-banner-copy { padding: 7px 16px; font-size: 13px; flex-shrink: 0; }
+.share-banner-dismiss {
+  background: none;
+  border: none;
+  color: rgba(255,255,255,0.35);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: color 0.15s;
+}
+.share-banner-dismiss:hover { color: rgba(255,255,255,0.8); }
+
+/* ─── Shared Invoice Page ────────────────────────────────── */
+.shared-page {
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+  background: var(--surface-2);
+}
+.shared-nav {
+  height: 60px;
+  background: var(--dark-2);
+  border-bottom: 1px solid rgba(255,255,255,0.07);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  flex-shrink: 0;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.shared-meta-bar {
+  background: var(--white);
+  border-bottom: 1px solid var(--border);
+  padding: 10px 24px;
+  font-size: 13px;
+  color: var(--muted);
+  font-weight: 500;
+}
+.shared-preview-wrap {
+  flex: 1;
+  padding: 32px 24px 64px;
+  display: flex;
+  justify-content: center;
+}
+.shared-preview-wrap .preview-panel {
+  width: 100%;
+  max-width: 860px;
+  height: auto;
+  overflow: visible;
+  padding: 0;
+  background: transparent;
+  border: none;
+  flex-shrink: 0;
+}
+.shared-preview-wrap .preview-label { display: none; }
+.shared-preview-wrap .invoice-doc { animation: none; }
+
+/* ─── Not Found (invoice segment) ───────────────────────── */
+.not-found-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  padding: 48px 24px;
+  text-align: center;
+}
+.not-found-code {
+  font-size: 88px;
+  font-weight: 800;
+  color: var(--border);
+  letter-spacing: -6px;
+  line-height: 1;
+}
+.not-found-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text);
+}
+.not-found-desc {
+  font-size: 14px;
+  color: var(--muted);
+  max-width: 340px;
+  line-height: 1.6;
+}
+
+@media (max-width: 600px) {
+  .share-banner-label { display: none; }
+  .share-banner { padding: 8px 16px; }
+  .shared-nav { padding: 0 16px; }
+  .shared-nav .nav-product, .shared-nav .nav-divider { display: none; }
+  .shared-preview-wrap { padding: 16px 12px 40px; }
+}

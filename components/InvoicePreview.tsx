@@ -444,15 +444,15 @@ const InvoicePreview = forwardRef<HTMLDivElement, InvoicePreviewProps>(
       <main className={`preview-panel${mobileVisible ? ' mobile-visible' : ''}`}>
         <div className="preview-label">Live Preview</div>
         <div
-        key={state.template}
-        ref={ref}
-        className={`invoice-doc ${state.theme} tpl-${state.template}`}
-        id="invoice-doc"
-        style={state.theme === 't-custom' ? {
-          ['--inv-accent' as string]: state.customColor,
-          ['--inv-accent-light' as string]: hexToRgba(state.customColor, 0.07),
-        } as React.CSSProperties : undefined}
-      >
+          key={state.template}
+          ref={ref}
+          className={`invoice-doc ${state.theme} tpl-${state.template}`}
+          id="invoice-doc"
+          style={state.theme === 't-custom' ? {
+            ['--inv-accent' as string]: state.customColor,
+            ['--inv-accent-light' as string]: hexToRgba(state.customColor, 0.07),
+          } as React.CSSProperties : undefined}
+        >
           {state.template === 'modern'  && <ModernLayout  {...tplProps} />}
           {state.template === 'bold'    && <BoldLayout    {...tplProps} />}
           {state.template === 'minimal' && <MinimalLayout {...tplProps} />}

@@ -29,7 +29,7 @@ export async function POST(req: NextRequest) {
     // Strip base64 logo before storing in Supabase
     const { logoDataUrl: _logo, ...stateWithoutLogo } = state;
 
-    const { error } = await supabase.from('invoices').insert({
+    const { data: row, error } = await supabase.from('invoices').insert({
       invoice_number: state.invoiceNumber || null,
       from_name:      state.fromName     || null,
       to_name:        state.toName       || null,
@@ -41,14 +41,14 @@ export async function POST(req: NextRequest) {
       has_logo:       !!state.logoDataUrl,
       pdf_url:        pdfUrl,
       state:          stateWithoutLogo,
-    });
+    }).select('id').single();
 
     if (error) {
       console.error('[save-invoice]', error.message);
       return NextResponse.json({ ok: false, error: error.message }, { status: 500 });
     }
 
-    return NextResponse.json({ ok: true, pdfUrl });
+    return NextResponse.json({ ok: true, pdfUrl, id: row.id });
   } catch (err) {
     console.error('[save-invoice] unexpected error', err);
     return NextResponse.json({ ok: false }, { status: 500 });

@@ -2,6 +2,7 @@
 
 import { useState, useRef, useCallback } from 'react';
 import Navbar from './Navbar';
+import ShareBanner from './ShareBanner';
 import FormPanel from './FormPanel';
 import InvoicePreview from './InvoicePreview';
 import type { InvoiceState, LineItem } from '@/lib/types';
@@ -37,6 +38,8 @@ export default function InvoiceApp() {
   const [state, setState] = useState<InvoiceState>(getDefaultState);
   const [mobilePanel, setMobilePanel] = useState<'form' | 'preview'>('form');
   const [isGenerating, setIsGenerating] = useState(false);
+  const [shareId, setShareId] = useState<string | null>(null);
+  const [shareBannerVisible, setShareBannerVisible] = useState(false);
   const invoiceRef = useRef<HTMLDivElement>(null);
 
   const handleChange = useCallback((updates: Partial<InvoiceState>) => {
@@ -124,7 +127,7 @@ export default function InvoiceApp() {
       const filename = `Invoice-${state.invoiceNumber || 'document'}.pdf`;
       const pdfBlob = pdf.output('blob');
 
-      // Trigger browser download
+      // Trigger browser download (instant)
       const downloadUrl = URL.createObjectURL(pdfBlob);
       const anchor = document.createElement('a');
       anchor.href = downloadUrl;
@@ -134,24 +137,39 @@ export default function InvoiceApp() {
       document.body.removeChild(anchor);
       URL.revokeObjectURL(downloadUrl);
 
-      // Fire-and-forget: upload PDF to Vercel Blob + save record to Supabase
-      const formData = new FormData();
-      formData.append('pdf', pdfBlob, filename);
-      formData.append('state', JSON.stringify(state));
-      fetch('/api/save-invoice', { method: 'POST', body: formData }).catch(() => {});
+      // Restore UI now so the button re-enables before the async save
+      el.style.minHeight = prevMinHeight;
+      placeholders.forEach(p => { p.style.display = ''; });
+      setIsGenerating(false);
+
+      // Await the cloud save (non-blocking to user — PDF already downloaded)
+      try {
+        const formData = new FormData();
+        formData.append('pdf', pdfBlob, filename);
+        formData.append('state', JSON.stringify(state));
+        const res = await fetch('/api/save-invoice', { method: 'POST', body: formData });
+        const json = await res.json();
+        if (json.ok && json.id) {
+          setShareId(json.id);
+          setShareBannerVisible(true);
+        }
+      } catch {
+        // save failed silently — share link just won't appear
+      }
     } catch (err) {
       console.error('PDF generation failed:', err);
       alert('PDF generation failed. Please try again.');
-    } finally {
       el.style.minHeight = prevMinHeight;
       placeholders.forEach(p => { p.style.display = ''; });
       setIsGenerating(false);
     }
-  }, [isGenerating, state.invoiceNumber]);
+  }, [isGenerating, state]);
 
   const resetInvoice = useCallback(() => {
     if (confirm('Clear this invoice and start fresh?')) {
       setState(getDefaultState());
+      setShareId(null);
+      setShareBannerVisible(false);
     }
   }, []);
 
@@ -162,6 +180,9 @@ export default function InvoiceApp() {
         onReset={resetInvoice}
         isGenerating={isGenerating}
       />
+      {shareBannerVisible && shareId && (
+        <ShareBanner shareId={shareId} onDismiss={() => setShareBannerVisible(false)} />
+      )}
       <div className="mobile-tab-bar">
         <button
           className={mobilePanel === 'form' ? 'active' : ''}
