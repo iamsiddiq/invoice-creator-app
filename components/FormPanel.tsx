@@ -40,7 +40,9 @@ function Card({ id, title, icon, collapsed, onToggle, children }: CardProps) {
         </div>
         <ChevronIcon />
       </div>
-      <div className="card-body">{children}</div>
+      <div className="card-body-wrap">
+        <div className="card-body">{children}</div>
+      </div>
     </div>
   );
 }

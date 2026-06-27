@@ -121,10 +121,21 @@ a { text-decoration: none; color: inherit; }
 }
 .card-icon svg { color: var(--blue); }
 .card-title { font-size: 13px; font-weight: 600; color: var(--text); letter-spacing: 0.01em; }
-.card-chevron { color: var(--muted-light); transition: transform 0.2s ease; }
+.card-chevron { color: var(--muted-light); transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1); }
 .card.collapsed .card-chevron { transform: rotate(-90deg); }
-.card-body { padding: 16px; display: flex; flex-direction: column; gap: 12px; }
-.card.collapsed .card-body { display: none; }
+/* Grid trick: animates height to/from auto without JS */
+.card-body-wrap {
+  display: grid;
+  grid-template-rows: 1fr;
+  transition: grid-template-rows 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.card.collapsed .card-body-wrap { grid-template-rows: 0fr; }
+.card-body {
+  overflow: hidden;
+  padding: 16px; display: flex; flex-direction: column; gap: 12px;
+  opacity: 1; transition: opacity 0.2s ease;
+}
+.card.collapsed .card-body { opacity: 0; padding: 0; }
 
 /* ─── Form Inputs ────────────────────────────────────────── */
 .form-row { display: grid; gap: 12px; }
@@ -351,8 +362,63 @@ a { text-decoration: none; color: inherit; }
 .footer-logo-text { color: #0A0A14; font-weight: 800; letter-spacing: -0.3px; }
 .footer-logo-dot { color: #0057FF; }
 
-/* ─── Spinner ────────────────────────────────────────────── */
+/* ─── Keyframes ──────────────────────────────────────────── */
 @keyframes spin { to { transform: rotate(360deg); } }
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes invoiceEnter {
+  from { opacity: 0; transform: translateY(10px) scale(0.985); }
+  to   { opacity: 1; transform: translateY(0)    scale(1); }
+}
+@keyframes rowIn {
+  from { opacity: 0; transform: translateX(-6px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+/* ─── Entrance animations ────────────────────────────────── */
+.form-panel-inner  { animation: fadeUp 0.4s cubic-bezier(0.22, 1, 0.36, 1) both; }
+.preview-panel     { animation: fadeUp 0.4s cubic-bezier(0.22, 1, 0.36, 1) 0.07s both; }
+.preview-label     { animation: fadeUp 0.35s ease 0.18s both; }
+.invoice-doc       { animation: invoiceEnter 0.38s cubic-bezier(0.22, 1, 0.36, 1) both; }
+.logo-preview-wrap { animation: fadeUp 0.25s ease both; }
+.items-table tbody tr { animation: rowIn 0.2s ease both; }
+
+/* ─── Card header hover ──────────────────────────────────── */
+.card-header       { transition: background 0.18s ease; }
+.card-header:hover { background: #ECEEF3; }
+
+/* ─── Button press states ────────────────────────────────── */
+.btn-ghost-dark:active { background: rgba(255,255,255,0.16); transform: scale(0.97); }
+.btn-primary:active    { transform: scale(0.97); box-shadow: 0 1px 6px rgba(0,87,255,0.3); }
+
+/* ─── Theme swatch press ─────────────────────────────────── */
+.theme-swatch:active { transform: scale(0.88); }
+
+/* ─── Invoice accent transitions (smooth theme switching) ── */
+.inv-company-name,
+.inv-number,
+.inv-section-label,
+.inv-items-table th,
+.footer-marav-link,
+.min-invoice-word,
+.min-bill-label,
+.min-note-label,
+.min-grand-total .tv { transition: color 0.32s ease; }
+
+.inv-bill-section,
+.inv-grand-total,
+.tpl-modern .mod-header,
+.tpl-modern .mod-bill,
+.bold-sidebar,
+.bold-bill { transition: background-color 0.32s ease; }
+
+.inv-header                { transition: border-color 0.32s ease; }
+.inv-items-table thead tr  { transition: border-color 0.32s ease; }
+.min-grand-total           { transition: border-color 0.32s ease; }
+.min-table th              { transition: color 0.32s ease, border-color 0.32s ease; }
 
 /* ─── Mobile Tab Bar ─────────────────────────────────────── */
 .mobile-tab-bar {
@@ -432,10 +498,12 @@ a { text-decoration: none; color: inherit; }
   flex-direction: column;
   align-items: center;
   gap: 5px;
-  transition: all 0.15s;
+  transition: all 0.2s cubic-bezier(0.22, 1, 0.36, 1);
 }
-.template-card:hover { border-color: var(--blue); background: rgba(0,87,255,0.02); }
+.template-card:hover { border-color: var(--blue); background: rgba(0,87,255,0.02); transform: translateY(-2px); box-shadow: var(--shadow-sm); }
+.template-card:active { transform: translateY(0); box-shadow: none; }
 .template-card.active { border-color: var(--blue); background: rgba(0,87,255,0.06); }
+.template-card.active:hover { transform: none; box-shadow: none; }
 .template-card.active .template-name { color: var(--blue); }
 .template-thumb {
   width: 100%;

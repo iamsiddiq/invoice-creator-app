@@ -444,6 +444,7 @@ const InvoicePreview = forwardRef<HTMLDivElement, InvoicePreviewProps>(
       <main className={`preview-panel${mobileVisible ? ' mobile-visible' : ''}`}>
         <div className="preview-label">Live Preview</div>
         <div
+        key={state.template}
         ref={ref}
         className={`invoice-doc ${state.theme} tpl-${state.template}`}
         id="invoice-doc"
