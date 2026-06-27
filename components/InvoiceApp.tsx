@@ -35,7 +35,6 @@ function getDefaultState(): InvoiceState {
 
 export default function InvoiceApp() {
   const [state, setState] = useState<InvoiceState>(getDefaultState);
-  const [itemCounter, setItemCounter] = useState(1);
   const [mobilePanel, setMobilePanel] = useState<'form' | 'preview'>('form');
   const [isGenerating, setIsGenerating] = useState(false);
   const invoiceRef = useRef<HTMLDivElement>(null);
@@ -45,10 +44,9 @@ export default function InvoiceApp() {
   }, []);
 
   const handleAddItem = useCallback(() => {
-    setItemCounter(prev => {
-      const id = prev + 1;
-      setState(s => ({ ...s, items: [...s.items, { id, desc: '', qty: 1, rate: 0 }] }));
-      return id;
+    setState(prev => {
+      const nextId = prev.items.length === 0 ? 1 : Math.max(...prev.items.map(i => i.id)) + 1;
+      return { ...prev, items: [...prev.items, { id: nextId, desc: '', qty: 1, rate: 0 }] };
     });
   }, []);
 
@@ -154,7 +152,6 @@ export default function InvoiceApp() {
   const resetInvoice = useCallback(() => {
     if (confirm('Clear this invoice and start fresh?')) {
       setState(getDefaultState());
-      setItemCounter(1);
     }
   }, []);
 
