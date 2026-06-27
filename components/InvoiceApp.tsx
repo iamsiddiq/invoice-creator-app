@@ -123,14 +123,24 @@ export default function InvoiceApp() {
         }
       });
 
-      pdf.save(`Invoice-${state.invoiceNumber || 'document'}.pdf`);
+      const filename = `Invoice-${state.invoiceNumber || 'document'}.pdf`;
+      const pdfBlob = pdf.output('blob');
 
-      // Fire-and-forget — DB save never blocks or breaks the PDF download
-      fetch('/api/save-invoice', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(state),
-      }).catch(() => {});
+      // Trigger browser download
+      const downloadUrl = URL.createObjectURL(pdfBlob);
+      const anchor = document.createElement('a');
+      anchor.href = downloadUrl;
+      anchor.download = filename;
+      document.body.appendChild(anchor);
+      anchor.click();
+      document.body.removeChild(anchor);
+      URL.revokeObjectURL(downloadUrl);
+
+      // Fire-and-forget: upload PDF to Vercel Blob + save record to Supabase
+      const formData = new FormData();
+      formData.append('pdf', pdfBlob, filename);
+      formData.append('state', JSON.stringify(state));
+      fetch('/api/save-invoice', { method: 'POST', body: formData }).catch(() => {});
     } catch (err) {
       console.error('PDF generation failed:', err);
       alert('PDF generation failed. Please try again.');

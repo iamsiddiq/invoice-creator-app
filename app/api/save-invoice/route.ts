@@ -1,15 +1,30 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { put } from '@vercel/blob';
 import { supabase } from '@/lib/supabase';
 import { calcTotals } from '@/lib/utils';
 import type { InvoiceState } from '@/lib/types';
 
 export async function POST(req: NextRequest) {
   try {
-    const state: InvoiceState = await req.json();
+    const form = await req.formData();
+    const pdfFile = form.get('pdf') as File | null;
+    const stateRaw = form.get('state') as string | null;
 
+    if (!pdfFile || !stateRaw) {
+      return NextResponse.json({ ok: false, error: 'Missing pdf or state' }, { status: 400 });
+    }
+
+    const state: InvoiceState = JSON.parse(stateRaw);
     const totals = calcTotals(state);
 
-    // Strip base64 logo — can be MBs, would exhaust free-tier storage quickly
+    // Upload PDF to Vercel Blob
+    const filename = `invoices/${state.invoiceNumber || 'invoice'}-${Date.now()}.pdf`;
+    const { url: pdfUrl } = await put(filename, pdfFile, {
+      access: 'public',
+      contentType: 'application/pdf',
+    });
+
+    // Strip base64 logo before storing in Supabase
     const { logoDataUrl: _logo, ...stateWithoutLogo } = state;
 
     const { error } = await supabase.from('invoices').insert({
@@ -22,6 +37,7 @@ export async function POST(req: NextRequest) {
       subtotal:       totals.subtotal,
       total:          totals.total,
       has_logo:       !!state.logoDataUrl,
+      pdf_url:        pdfUrl,
       state:          stateWithoutLogo,
     });
 
@@ -30,7 +46,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ ok: false, error: error.message }, { status: 500 });
     }
 
-    return NextResponse.json({ ok: true });
+    return NextResponse.json({ ok: true, pdfUrl });
   } catch (err) {
     console.error('[save-invoice] unexpected error', err);
     return NextResponse.json({ ok: false }, { status: 500 });
