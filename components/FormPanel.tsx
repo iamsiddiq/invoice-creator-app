@@ -57,7 +57,7 @@ const THEMES: { id: Theme; color: string; label: string }[] = [
 const TEMPLATES: { id: Template; label: string }[] = [
   { id: 'classic', label: 'Classic' },
   { id: 'modern',  label: 'Modern'  },
-  { id: 'bold',    label: 'Bold'    },
+  // { id: 'bold',    label: 'Bold'    },
   { id: 'minimal', label: 'Minimal' },
 ];
 
@@ -146,14 +146,18 @@ const CURRENCIES: { value: Currency; label: string }[] = [
 ];
 
 export default function FormPanel({ state, onChange, onAddItem, onRemoveItem, onUpdateItem, mobileVisible }: FormPanelProps) {
+  const ALL_CARDS = ['style', 'from', 'to', 'details', 'items', 'totals', 'notes'];
   const [collapsed, setCollapsed] = useState<Set<string>>(new Set(['from', 'to', 'details', 'items', 'totals', 'notes']));
   const [dragOver, setDragOver] = useState(false);
 
   const toggleCard = (id: string) => {
     setCollapsed(prev => {
-      const next = new Set(prev);
-      next.has(id) ? next.delete(id) : next.add(id);
-      return next;
+      if (!prev.has(id)) {
+        // Already open — close it
+        return new Set([...prev, id]);
+      }
+      // Open this one, collapse everything else
+      return new Set(ALL_CARDS.filter(c => c !== id));
     });
   };
 
