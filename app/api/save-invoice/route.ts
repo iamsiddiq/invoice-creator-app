@@ -20,7 +20,7 @@ export async function POST(req: NextRequest) {
     // Upload PDF to Vercel Blob
     const filename = `invoices/${state.invoiceNumber || 'invoice'}-${Date.now()}.pdf`;
     const { url: pdfUrl } = await put(filename, pdfFile, {
-      access: 'public',
+      access: 'private',
       contentType: 'application/pdf',
     });
 
