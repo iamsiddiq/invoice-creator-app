@@ -40,7 +40,7 @@ export default async function SharedInvoicePage({ params }: Props) {
 
   const { data, error } = await supabase
     .from('invoices')
-    .select('id, state, from_name, to_name, invoice_number, pdf_url, created_at')
+    .select('id, state, from_name, to_name, invoice_number, pdf_url, logo_url, created_at')
     .eq('id', id)
     .single();
 
@@ -48,7 +48,7 @@ export default async function SharedInvoicePage({ params }: Props) {
 
   const invoiceState: InvoiceState = {
     ...(data.state as Omit<InvoiceState, 'logoDataUrl'>),
-    logoDataUrl: null,
+    logoDataUrl: (data as { logo_url?: string | null }).logo_url ?? null,
   };
 
   return (

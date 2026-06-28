@@ -26,7 +26,23 @@ export async function POST(req: NextRequest) {
       contentType: 'application/pdf',
     });
 
-    // Strip base64 logo before storing in Supabase
+    // Upload logo to Vercel Blob if present
+    let logoUrl: string | null = null;
+    if (state.logoDataUrl) {
+      const match = state.logoDataUrl.match(/^data:([^;]+);base64,(.+)$/);
+      if (match) {
+        const [, mimeType, b64] = match;
+        const logoBuffer = Buffer.from(b64, 'base64');
+        const logoFilename = `logos/${Date.now()}.${mimeType.split('/')[1] || 'png'}`;
+        const { url } = await put(logoFilename, logoBuffer, {
+          access: 'public',
+          contentType: mimeType,
+        });
+        logoUrl = url;
+      }
+    }
+
+    // Strip base64 logo before storing in Supabase (blob URL stored separately)
     const { logoDataUrl: _logo, ...stateWithoutLogo } = state;
 
     const { data: row, error } = await supabase.from('invoices').insert({
@@ -39,6 +55,7 @@ export async function POST(req: NextRequest) {
       subtotal:       totals.subtotal,
       total:          totals.total,
       has_logo:       !!state.logoDataUrl,
+      logo_url:       logoUrl,
       pdf_url:        pdfUrl,
       state:          stateWithoutLogo,
     }).select('id').single();
