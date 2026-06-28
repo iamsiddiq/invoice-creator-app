@@ -35,7 +35,7 @@ export async function POST(req: NextRequest) {
         const logoBuffer = Buffer.from(b64, 'base64');
         const logoFilename = `logos/${Date.now()}.${mimeType.split('/')[1] || 'png'}`;
         const { url } = await put(logoFilename, logoBuffer, {
-          access: 'public',
+          access: 'private',
           contentType: mimeType,
         });
         logoUrl = url;

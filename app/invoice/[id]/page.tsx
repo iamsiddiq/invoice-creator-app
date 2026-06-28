@@ -46,9 +46,22 @@ export default async function SharedInvoicePage({ params }: Props) {
 
   if (error || !data) notFound();
 
+  const logoUrl = (data as { logo_url?: string | null }).logo_url ?? null;
+  let logoDataUrl: string | null = null;
+  if (logoUrl) {
+    const res = await fetch(logoUrl, {
+      headers: { Authorization: `Bearer ${process.env.BLOB_READ_WRITE_TOKEN}` },
+    });
+    if (res.ok) {
+      const contentType = res.headers.get('content-type') || 'image/png';
+      const buffer = await res.arrayBuffer();
+      logoDataUrl = `data:${contentType};base64,${Buffer.from(buffer).toString('base64')}`;
+    }
+  }
+
   const invoiceState: InvoiceState = {
     ...(data.state as Omit<InvoiceState, 'logoDataUrl'>),
-    logoDataUrl: (data as { logo_url?: string | null }).logo_url ?? null,
+    logoDataUrl,
   };
 
   return (
