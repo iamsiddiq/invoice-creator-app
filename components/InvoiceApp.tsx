@@ -1,12 +1,14 @@
 'use client';
 
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback, useEffect } from 'react';
+import Link from 'next/link';
 import Navbar from './Navbar';
 import ShareBanner from './ShareBanner';
 import FormPanel from './FormPanel';
 import InvoicePreview from './InvoicePreview';
 import type { InvoiceState, LineItem } from '@/lib/types';
 import { formatDateInput, generateInvoiceNumber } from '@/lib/utils';
+import { createClient } from '@/lib/supabase/client';
 
 function getDefaultState(): InvoiceState {
   const today = new Date();
@@ -40,7 +42,30 @@ export default function InvoiceApp() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [shareId, setShareId] = useState<string | null>(null);
   const [shareBannerVisible, setShareBannerVisible] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
+  const [signInBannerDismissed, setSignInBannerDismissed] = useState(false);
   const invoiceRef = useRef<HTMLDivElement>(null);
+
+  // Load invoice from history ("Edit" button) and check auth state on mount
+  useEffect(() => {
+    const pending = localStorage.getItem('marav_pending_invoice');
+    if (pending) {
+      try {
+        const loaded = JSON.parse(pending) as Partial<InvoiceState>;
+        setState(s => ({ ...s, ...loaded, logoDataUrl: null }));
+      } catch {}
+      localStorage.removeItem('marav_pending_invoice');
+    }
+
+    const supabase = createClient();
+    supabase.auth.getUser().then(({ data }) => {
+      setIsAuthenticated(!!data.user);
+    });
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_, session) => {
+      setIsAuthenticated(!!session?.user);
+    });
+    return () => subscription.unsubscribe();
+  }, []);
 
   const handleChange = useCallback((updates: Partial<InvoiceState>) => {
     setState(prev => ({ ...prev, ...updates }));
@@ -182,6 +207,18 @@ export default function InvoiceApp() {
       />
       {shareBannerVisible && shareId && (
         <ShareBanner shareId={shareId} onDismiss={() => setShareBannerVisible(false)} />
+      )}
+      {isAuthenticated === false && !signInBannerDismissed && (
+        <div className="signin-banner">
+          <span className="signin-banner-text">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+            </svg>
+            Sign in to save your invoice history and sync across devices.
+          </span>
+          <Link href="/login" className="signin-banner-btn">Sign In</Link>
+          <button className="signin-banner-close" onClick={() => setSignInBannerDismissed(true)}>✕</button>
+        </div>
       )}
       <div className="mobile-tab-bar">
         <button

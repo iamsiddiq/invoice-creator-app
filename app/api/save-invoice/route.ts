@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 export const dynamic = 'force-dynamic';
 import { put } from '@vercel/blob';
 import { supabase } from '@/lib/supabase';
+import { createClient } from '@/lib/supabase/server';
 import { calcTotals } from '@/lib/utils';
 import type { InvoiceState } from '@/lib/types';
 
@@ -18,6 +19,10 @@ export async function POST(req: NextRequest) {
 
     const state: InvoiceState = JSON.parse(stateRaw);
     const totals = calcTotals(state);
+
+    // Get authenticated user (if any) from session cookie
+    const serverSupabase = await createClient();
+    const { data: { user } } = await serverSupabase.auth.getUser();
 
     // Upload PDF to Vercel Blob
     const filename = `invoices/${state.invoiceNumber || 'invoice'}-${Date.now()}.pdf`;
@@ -58,6 +63,7 @@ export async function POST(req: NextRequest) {
       logo_url:       logoUrl,
       pdf_url:        pdfUrl,
       state:          stateWithoutLogo,
+      user_id:        user?.id ?? null,
     }).select('id').single();
 
     if (error) {

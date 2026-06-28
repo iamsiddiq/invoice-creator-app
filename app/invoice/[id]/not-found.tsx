@@ -5,7 +5,8 @@ export default function InvoiceNotFound() {
     <div className="shared-page">
       <nav className="shared-nav">
         <div className="nav-brand">
-          <div className="nav-logo-text">MARAV<span>.</span></div>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/logo-compact-dark.svg" alt="MARAV." height="22" style={{ display: 'block' }} />
           <div className="nav-divider" />
           <div className="nav-product">Invoice</div>
         </div>

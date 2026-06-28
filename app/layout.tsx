@@ -8,7 +8,7 @@ export const metadata: Metadata = {
   title: 'Free Invoice Generator — MARAV Tech',
   description: 'Create professional invoices in under 60 seconds. Free, no account required.',
   icons: {
-    icon: '/icon.svg',
+    icon: '/logo-icon.svg',
   },
 };
 
