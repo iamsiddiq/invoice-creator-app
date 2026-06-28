@@ -9,8 +9,7 @@ export default function Navbar({ onDownload, onReset, isGenerating }: NavbarProp
     <nav className="app-nav">
       <div className="nav-brand">
         <div className="nav-logo-text">MARAV<span>.</span></div>
-        <div className="nav-divider" />
-        <div className="nav-product">Invoice Generator</div>
+        <div className="nav-product">Invoice</div>
         <div className="nav-divider" />
         <span className="badge badge-blue">Free</span>
       </div>

@@ -5,7 +5,7 @@ import './globals.css';
 const inter = Inter({ subsets: ['latin'], weight: ['300', '400', '500', '600', '700', '800'] });
 
 export const metadata: Metadata = {
-  title: 'Free Online Invoice Creator — MARAV Technologies',
+  title: 'Free Invoice Generator — MARAV Tech',
   description: 'Create professional invoices in under 60 seconds. Free, no account required.',
   icons: {
     icon: '/icon.svg',

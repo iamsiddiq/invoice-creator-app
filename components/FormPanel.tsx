@@ -13,6 +13,24 @@ interface FormPanelProps {
   mobileVisible: boolean;
 }
 
+function MatIcon({ d }: { d: string }) {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+      <path d={d} />
+    </svg>
+  );
+}
+
+const MI = {
+  palette:  'M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9c.83 0 1.5-.67 1.5-1.5 0-.39-.15-.74-.39-1.01-.23-.26-.38-.61-.38-.99 0-.83.67-1.5 1.5-1.5H16c2.76 0 5-2.24 5-5 0-4.42-4.03-8-9-8zm-5.5 9c-.83 0-1.5-.67-1.5-1.5S5.67 9 6.5 9 8 9.67 8 10.5 7.33 12 6.5 12zm3-4C8.67 8 8 7.33 8 6.5S8.67 5 9.5 5s1.5.67 1.5 1.5S10.33 8 9.5 8zm5 0c-.83 0-1.5-.67-1.5-1.5S13.67 5 14.5 5s1.5.67 1.5 1.5S15.33 8 14.5 8zm3 4c-.83 0-1.5-.67-1.5-1.5S16.67 9 17.5 9s1.5.67 1.5 1.5-.67 1.5-1.5 1.5z',
+  business: 'M12 7V3H2v18h20V7H12zM6 19H4v-2h2v2zm0-4H4v-2h2v2zm0-4H4V9h2v2zm0-4H4V5h2v2zm4 12H8v-2h2v2zm0-4H8v-2h2v2zm0-4H8V9h2v2zm0-4H8V5h2v2zm10 12h-8V9h8v10zm-2-8h-4v2h4v-2zm0 4h-4v2h4v-2z',
+  person:   'M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0-6c1.1 0 2 .9 2 2s-.9 2-2 2-2-.9-2-2 .9-2 2-2zm0 7c-2.67 0-8 1.34-8 4v3h16v-3c0-2.66-5.33-4-8-4zm6 5H6v-.99c.2-.72 3.3-2.01 6-2.01s5.8 1.29 6 2v1z',
+  receipt:  'M19.5 3.5L18 2l-1.5 1.5L15 2l-1.5 1.5L12 2l-1.5 1.5L9 2 7.5 3.5 6 2 4.5 3.5 3 2v20l1.5-1.5L6 22l1.5-1.5L9 22l1.5-1.5L12 22l1.5-1.5L15 22l1.5-1.5L18 22l1.5-1.5L21 22V2l-1.5 1.5zM19 19.09H5V4.91h14v14.18zM6 15h12v2H6zm0-4h12v2H6zm0-4h12v2H6z',
+  listAlt:  'M19 5v14H5V5h14m1.1-2H3.9c-.5 0-.9.4-.9.9v16.2c0 .4.4.9.9.9h16.2c.4 0 .9-.5.9-.9V3.9c0-.5-.5-.9-.9-.9zM11 7h6v2h-6V7zm0 4h6v2h-6v-2zm0 4h6v2h-6v-2zM7 7h2v2H7V7zm0 4h2v2H7v-2zm0 4h2v2H7v-2z',
+  calculate:'M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14zM6.25 7.72h5.5v1.5h-5.5zm0 3.01h5.5v1.5h-5.5zm0 3.01h5.5v1.5h-5.5zm8.92 2.26l-1.41-1.41-1.41 1.41-1.06-1.06 1.41-1.41-1.41-1.41 1.06-1.06 1.41 1.41 1.41-1.41 1.06 1.06-1.41 1.41 1.41 1.41zm.23-6.63h-2.82v1.41h2.82V9.37zm0 2.47h-2.82v1.41h2.82v-1.41z',
+  notes:    'M21 11.01L3 11v2h18zM3 16h12v2H3zM21 6H3v2.01L21 8z',
+};
+
 function ChevronIcon() {
   return (
     <svg className="card-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -48,12 +66,12 @@ function Card({ id, title, icon, collapsed, onToggle, children }: CardProps) {
 }
 
 const THEMES: { id: Theme; color: string; label: string }[] = [
-  { id: 't-blue',    color: '#0057FF', label: 'Blueprint Blue' },
-  { id: 't-dark',    color: '#1E293B', label: 'Midnight Dark' },
-  { id: 't-teal',    color: '#0891B2', label: 'Ocean Teal' },
-  { id: 't-emerald', color: '#059669', label: 'Emerald Green' },
+  { id: 't-blue',    color: '#0057FF', label: 'Blue' },
+  { id: 't-dark',    color: '#1E293B', label: 'Dark' },
+  { id: 't-teal',    color: '#0891B2', label: 'Teal' },
+  { id: 't-emerald', color: '#059669', label: 'Emerald' },
   { id: 't-violet',  color: '#7C3AED', label: 'Violet' },
-  { id: 't-rose',    color: '#E11D48', label: 'Rose Red' },
+  { id: 't-rose',    color: '#E11D48', label: 'Rose' },
 ];
 
 const TEMPLATES: { id: Template; label: string }[] = [
@@ -183,7 +201,7 @@ export default function FormPanel({ state, onChange, onAddItem, onRemoveItem, on
         <Card
           id="card-style" title="Customize Style" collapsed={collapsed.has('style')}
           onToggle={() => toggleCard('style')}
-          icon={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>}
+          icon={<MatIcon d={MI.palette} />}
         >
           <div className="form-group">
             <label className="form-label">Invoice Template</label>
@@ -205,29 +223,45 @@ export default function FormPanel({ state, onChange, onAddItem, onRemoveItem, on
             </div>
           </div>
           <div className="form-group">
-            <label className="form-label">Color Theme</label>
+            <label className="form-label">Theme Color</label>
             <div className="theme-picker">
               {THEMES.map(t => (
-                <div
-                  key={t.id}
-                  className={`theme-swatch${state.theme === t.id ? ' active' : ''}`}
-                  style={{ background: t.color }}
-                  title={t.label}
-                  onClick={() => onChange({ theme: t.id })}
-                />
+                <div key={t.id} className="theme-swatch-item">
+                  <div
+                    className={`theme-swatch${state.theme === t.id ? ' active' : ''}`}
+                    style={{ background: t.color }}
+                    title={t.label}
+                    onClick={() => onChange({ theme: t.id })}
+                  >
+                    {state.theme === t.id && (
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                        <polyline points="20 6 9 17 4 12" />
+                      </svg>
+                    )}
+                  </div>
+                  <span className={`theme-swatch-label${state.theme === t.id ? ' active' : ''}`}>{t.label}</span>
+                </div>
               ))}
-              <label
-                className={`theme-swatch theme-swatch-custom${state.theme === 't-custom' ? ' active' : ''}`}
-                style={{ background: state.theme === 't-custom' ? state.customColor : 'conic-gradient(red, yellow, lime, aqua, blue, magenta, red)' }}
-                title="Custom Color"
-              >
-                <input
-                  type="color"
-                  value={state.customColor}
-                  onChange={e => onChange({ theme: 't-custom', customColor: e.target.value })}
-                  style={{ position: 'absolute', opacity: 0, width: 0, height: 0 }}
-                />
-              </label>
+              <div className="theme-swatch-item">
+                <label
+                  className={`theme-swatch theme-swatch-custom${state.theme === 't-custom' ? ' active' : ''}`}
+                  style={{ background: state.theme === 't-custom' ? state.customColor : 'conic-gradient(red, yellow, lime, aqua, blue, magenta, red)' }}
+                  title="Custom Color"
+                >
+                  <input
+                    type="color"
+                    value={state.customColor}
+                    onChange={e => onChange({ theme: 't-custom', customColor: e.target.value })}
+                    style={{ position: 'absolute', opacity: 0, width: 0, height: 0 }}
+                  />
+                  {state.theme === 't-custom' && (
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                      <polyline points="20 6 9 17 4 12" />
+                    </svg>
+                  )}
+                </label>
+                <span className={`theme-swatch-label${state.theme === 't-custom' ? ' active' : ''}`}>Custom</span>
+              </div>
             </div>
           </div>
         </Card>
@@ -236,7 +270,7 @@ export default function FormPanel({ state, onChange, onAddItem, onRemoveItem, on
         <Card
           id="card-from" title="Your Business" collapsed={collapsed.has('from')}
           onToggle={() => toggleCard('from')}
-          icon={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>}
+          icon={<MatIcon d={MI.business} />}
         >
           <div className="form-group">
             <label className="form-label">Company Logo</label>
@@ -290,7 +324,7 @@ export default function FormPanel({ state, onChange, onAddItem, onRemoveItem, on
         <Card
           id="card-to" title="Bill To" collapsed={collapsed.has('to')}
           onToggle={() => toggleCard('to')}
-          icon={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>}
+          icon={<MatIcon d={MI.person} />}
         >
           <div className="form-group">
             <label className="form-label">Client / Company Name</label>
@@ -316,7 +350,7 @@ export default function FormPanel({ state, onChange, onAddItem, onRemoveItem, on
         <Card
           id="card-details" title="Invoice Details" collapsed={collapsed.has('details')}
           onToggle={() => toggleCard('details')}
-          icon={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>}
+          icon={<MatIcon d={MI.receipt} />}
         >
           <div className="form-row cols-2">
             <div className="form-group">
@@ -350,7 +384,7 @@ export default function FormPanel({ state, onChange, onAddItem, onRemoveItem, on
         <Card
           id="card-items" title="Line Items" collapsed={collapsed.has('items')}
           onToggle={() => toggleCard('items')}
-          icon={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>}
+          icon={<MatIcon d={MI.listAlt} />}
         >
           <div className="items-table-wrap">
             <table className="items-table">
@@ -409,7 +443,7 @@ export default function FormPanel({ state, onChange, onAddItem, onRemoveItem, on
         <Card
           id="card-totals" title="Tax & Totals" collapsed={collapsed.has('totals')}
           onToggle={() => toggleCard('totals')}
-          icon={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>}
+          icon={<MatIcon d={MI.calculate} />}
         >
           <div className="totals-section">
             <div className="totals-row">
@@ -524,7 +558,7 @@ export default function FormPanel({ state, onChange, onAddItem, onRemoveItem, on
         <Card
           id="card-notes" title="Notes & Terms" collapsed={collapsed.has('notes')}
           onToggle={() => toggleCard('notes')}
-          icon={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>}
+          icon={<MatIcon d={MI.notes} />}
         >
           <div className="form-group">
             <label className="form-label">Notes to Client</label>

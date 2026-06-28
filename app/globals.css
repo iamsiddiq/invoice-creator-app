@@ -246,15 +246,17 @@ a { text-decoration: none; color: inherit; }
 .total-summary-row.grand .ts-value { color: var(--blue); font-size: 16px; font-weight: 800; }
 
 /* ─── Theme Picker ───────────────────────────────────────── */
-.theme-picker { display: flex; gap: 8px; flex-wrap: wrap; }
+.theme-picker { display: flex; gap: 10px; flex-wrap: wrap; }
+.theme-swatch-item { display: flex; flex-direction: column; align-items: center; gap: 5px; }
+.theme-swatch-label { font-size: 9px; font-weight: 400; color: var(--muted); text-align: center; }
+.theme-swatch-label.active { font-weight: 600; }
 .theme-swatch {
   width: 32px; height: 32px; border-radius: 50%; cursor: pointer;
-  border: 3px solid transparent; transition: all 0.15s;
+  border: none; transition: transform 0.15s;
+  display: flex; align-items: center; justify-content: center;
 }
-.theme-swatch:hover { transform: scale(1.15); }
-.theme-swatch.active {
-  box-shadow: 0 0 0 2px var(--white), 0 0 0 4px var(--text);
-}
+.theme-swatch:hover { transform: scale(1.12); }
+.theme-swatch.active { transform: scale(1.08); }
 .theme-swatch-custom {
   position: relative; overflow: hidden;
 }
