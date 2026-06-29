@@ -25,13 +25,15 @@ export async function middleware(request: NextRequest) {
   // Refresh session so it doesn't expire mid-visit
   const { data: { user } } = await supabase.auth.getUser();
 
-  if (!user && request.nextUrl.pathname.startsWith('/history')) {
-    return NextResponse.redirect(new URL('/login', request.url));
+  const pathname = request.nextUrl.pathname;
+
+  if (!user && (pathname.startsWith('/history') || pathname.startsWith('/admin'))) {
+    return NextResponse.redirect(new URL('/', request.url));
   }
 
   return response;
 }
 
 export const config = {
-  matcher: ['/history/:path*'],
+  matcher: ['/history/:path*', '/admin/:path*'],
 };

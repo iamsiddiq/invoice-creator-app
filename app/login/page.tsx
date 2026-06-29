@@ -49,7 +49,7 @@ export default function LoginPage() {
 
         <h1 className="auth-heading">Sign in</h1>
         <p className="auth-subheading">
-          We&apos;ll email you a 6-digit code. No password needed.
+          We&apos;ll send you an email with a magic link. No password needed.
         </p>
 
         <form onSubmit={handleSubmit}>

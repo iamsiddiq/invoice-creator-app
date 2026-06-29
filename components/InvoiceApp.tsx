@@ -1,10 +1,11 @@
 'use client';
 
 import { useState, useRef, useCallback, useEffect } from 'react';
-import Link from 'next/link';
 import Navbar from './Navbar';
 import ShareBanner from './ShareBanner';
 import FormPanel from './FormPanel';
+import HistorySidePanel from './HistorySidePanel';
+import SettingsSidePanel from './SettingsSidePanel';
 import InvoicePreview from './InvoicePreview';
 import type { InvoiceState, LineItem } from '@/lib/types';
 import { formatDateInput, generateInvoiceNumber } from '@/lib/utils';
@@ -39,6 +40,7 @@ function getDefaultState(): InvoiceState {
 export default function InvoiceApp() {
   const [state, setState] = useState<InvoiceState>(getDefaultState);
   const [mobilePanel, setMobilePanel] = useState<'form' | 'preview'>('form');
+  const [sidePanel, setSidePanel] = useState<'form' | 'history' | 'settings'>('form');
   const [isGenerating, setIsGenerating] = useState(false);
   const [shareId, setShareId] = useState<string | null>(null);
   const [shareBannerVisible, setShareBannerVisible] = useState(false);
@@ -190,20 +192,17 @@ export default function InvoiceApp() {
     }
   }, [isGenerating, state]);
 
-  const resetInvoice = useCallback(() => {
-    if (confirm('Clear this invoice and start fresh?')) {
-      setState(getDefaultState());
-      setShareId(null);
-      setShareBannerVisible(false);
-    }
+  const loadInvoice = useCallback((loaded: Partial<InvoiceState>) => {
+    setState(s => ({ ...s, ...loaded, logoDataUrl: null }));
   }, []);
 
   return (
     <div className="app">
       <Navbar
         onDownload={downloadPDF}
-        onReset={resetInvoice}
         isGenerating={isGenerating}
+        onShowHistory={() => { setSidePanel('history'); setMobilePanel('form'); }}
+        onShowSettings={() => { setSidePanel('settings'); setMobilePanel('form'); }}
       />
       {shareBannerVisible && shareId && (
         <ShareBanner shareId={shareId} onDismiss={() => setShareBannerVisible(false)} />
@@ -216,8 +215,7 @@ export default function InvoiceApp() {
             </svg>
             Sign in to save your invoice history and sync across devices.
           </span>
-          <Link href="/login" className="signin-banner-btn">Sign In</Link>
-          <button className="signin-banner-close" onClick={() => setSignInBannerDismissed(true)}>✕</button>
+          <button className="signin-banner-btn cursor-pointer" onClick={() => document.dispatchEvent(new CustomEvent('marav:open-auth'))}>Sign In</button>
         </div>
       )}
       <div className="mobile-tab-bar">
@@ -235,14 +233,27 @@ export default function InvoiceApp() {
         </button>
       </div>
       <div className="app-body">
-        <FormPanel
-          state={state}
-          onChange={handleChange}
-          onAddItem={handleAddItem}
-          onRemoveItem={handleRemoveItem}
-          onUpdateItem={handleUpdateItem}
-          mobileVisible={mobilePanel === 'form'}
-        />
+        {sidePanel === 'history' ? (
+          <HistorySidePanel
+            onBack={() => setSidePanel('form')}
+            onLoad={loadInvoice}
+            mobileVisible={mobilePanel === 'form'}
+          />
+        ) : sidePanel === 'settings' ? (
+          <SettingsSidePanel
+            onBack={() => setSidePanel('form')}
+            mobileVisible={mobilePanel === 'form'}
+          />
+        ) : (
+          <FormPanel
+            state={state}
+            onChange={handleChange}
+            onAddItem={handleAddItem}
+            onRemoveItem={handleRemoveItem}
+            onUpdateItem={handleUpdateItem}
+            mobileVisible={mobilePanel === 'form'}
+          />
+        )}
         <InvoicePreview
           ref={invoiceRef}
           state={state}

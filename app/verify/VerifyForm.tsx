@@ -1,85 +1,29 @@
 'use client';
 
-import { useRef, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import Link from 'next/link';
+import { useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
 
-interface Props {
-  email: string;
-  authError?: string;
-}
-
-export default function VerifyForm({ email, authError }: Props) {
-  const [digits, setDigits] = useState(['', '', '', '', '', '']);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(authError === 'auth_failed' ? 'Link expired. Enter your code or request a new one.' : '');
+export default function VerifyForm({ email }: { email: string }) {
+  const [resending, setResending] = useState(false);
   const [resent, setResent] = useState(false);
-  const inputs = useRef<(HTMLInputElement | null)[]>([]);
-  const router = useRouter();
-
-  const code = digits.join('');
-
-  async function verify(otp: string) {
-    if (otp.length < 6 || loading) return;
-    setLoading(true);
-    setError('');
-
-    const supabase = createClient();
-    const { error: verifyError } = await supabase.auth.verifyOtp({
-      email,
-      token: otp,
-      type: 'email',
-    });
-
-    if (verifyError) {
-      setError('Invalid or expired code. Try again.');
-      setDigits(['', '', '', '', '', '']);
-      inputs.current[0]?.focus();
-      setLoading(false);
-      return;
-    }
-
-    router.replace('/');
-  }
-
-  function handleChange(i: number, val: string) {
-    // Support paste into any box
-    if (val.length > 1) {
-      const clean = val.replace(/\D/g, '').slice(0, 6);
-      const next = Array.from({ length: 6 }, (_, j) => clean[j] ?? '');
-      setDigits(next);
-      const last = Math.min(clean.length - 1, 5);
-      inputs.current[last]?.focus();
-      if (clean.length >= 6) verify(clean);
-      return;
-    }
-    const digit = val.replace(/\D/g, '').slice(0, 1);
-    const next = [...digits];
-    next[i] = digit;
-    setDigits(next);
-    if (digit && i < 5) inputs.current[i + 1]?.focus();
-    const joined = next.join('');
-    if (joined.length === 6) verify(joined);
-  }
-
-  function handleKeyDown(i: number, e: React.KeyboardEvent<HTMLInputElement>) {
-    if (e.key === 'Backspace' && !digits[i] && i > 0) {
-      const next = [...digits];
-      next[i - 1] = '';
-      setDigits(next);
-      inputs.current[i - 1]?.focus();
-    }
-  }
+  const [error, setError] = useState('');
 
   async function resend() {
+    setResending(true);
     setError('');
     setResent(false);
     const supabase = createClient();
-    await supabase.auth.signInWithOtp({
+    const { error: err } = await supabase.auth.signInWithOtp({
       email,
       options: { emailRedirectTo: `${window.location.origin}/auth/callback` },
     });
-    setResent(true);
+    setResending(false);
+    if (err) {
+      setError('Could not resend. Try again.');
+    } else {
+      setResent(true);
+    }
   }
 
   return (
@@ -91,44 +35,46 @@ export default function VerifyForm({ email, authError }: Props) {
           <div className="auth-brand-sub">Invoice</div>
         </div>
 
+        <div style={{
+          width: 64, height: 64, borderRadius: 16, margin: '8px 0 20px',
+          background: 'rgba(0,87,255,0.07)', border: '1px solid rgba(0,87,255,0.15)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+        }}>
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#0057FF" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+            <rect x="2" y="4" width="20" height="16" rx="2" />
+            <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
+          </svg>
+        </div>
+
         <h1 className="auth-heading">Check your email</h1>
         <p className="auth-subheading">
-          We sent a 6-digit code to{' '}
-          <strong style={{ color: 'var(--text)', fontWeight: 600 }}>{email}</strong>
+          We sent a sign-in link to{' '}
+          <strong style={{ color: 'var(--text)', fontWeight: 600 }}>{email}</strong>.
+          Tap the link in the email to sign in.
         </p>
 
-        <div className="otp-row">
-          {digits.map((d, i) => (
-            <input
-              key={i}
-              ref={el => { inputs.current[i] = el; }}
-              className="otp-box"
-              type="text"
-              inputMode="numeric"
-              maxLength={i === 0 ? 6 : 1}
-              value={d}
-              autoFocus={i === 0}
-              disabled={loading}
-              onChange={e => handleChange(i, e.target.value)}
-              onKeyDown={e => handleKeyDown(i, e)}
-            />
-          ))}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, margin: '4px 0 20px', color: 'var(--muted)', fontSize: 13 }}>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ animation: 'spin 1.2s linear infinite', flexShrink: 0 }}>
+            <path d="M21 12a9 9 0 1 1-6.219-8.56" />
+          </svg>
+          Waiting for you to click the link…
         </div>
 
         {error && <p className="auth-error">{error}</p>}
-        {resent && !error && <p className="auth-success">New code sent!</p>}
+        {resent && <p className="auth-success">New link sent!</p>}
 
         <button
           className="auth-btn"
-          onClick={() => verify(code)}
-          disabled={loading || code.length < 6}
+          onClick={resend}
+          disabled={resending}
+          style={{ background: 'transparent', color: 'var(--text)', border: '1px solid var(--border)' }}
         >
-          {loading ? <span className="auth-spinner" /> : 'Verify Code'}
+          {resending ? <span className="auth-spinner" /> : 'Resend link'}
         </button>
 
-        <button className="auth-link-btn" onClick={resend} disabled={loading}>
-          Didn&apos;t receive it? Resend code
-        </button>
+        <Link href="/login" className="auth-link-btn" style={{ marginTop: 8 }}>
+          Try a different email
+        </Link>
       </div>
     </div>
   );

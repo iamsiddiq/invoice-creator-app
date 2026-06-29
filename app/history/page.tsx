@@ -33,6 +33,38 @@ export default async function HistoryPage() {
 
   if (!user) redirect('/login');
 
+  const { data: profileData } = await supabase
+    .from('profiles')
+    .select('plan')
+    .eq('id', user.id)
+    .single();
+
+  const isPro = profileData?.plan === 'pro';
+
+  if (!isPro) {
+    return (
+      <div className="app" style={{ minHeight: '100vh' }}>
+        <Navbar />
+        <div className="history-page">
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: 420, textAlign: 'center', padding: '0 24px' }}>
+            <div style={{ width: 72, height: 72, borderRadius: 20, background: 'rgba(0,87,255,0.07)', border: '1px solid rgba(0,87,255,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 20 }}>
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#0057FF" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                <rect x="3" y="11" width="18" height="11" rx="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" />
+              </svg>
+            </div>
+            <h2 style={{ fontSize: 22, fontWeight: 700, color: 'var(--text)', marginBottom: 8 }}>Pro feature</h2>
+            <p style={{ fontSize: 14, color: 'var(--muted)', maxWidth: 340, lineHeight: 1.6 }}>
+              Upgrade to Pro to view and manage all your saved invoices across devices.
+            </p>
+            <a href="#" className="btn btn-primary" style={{ marginTop: 28, textDecoration: 'none' }}>
+              Upgrade to Pro
+            </a>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   const { data: invoices, error } = await supabase
     .from('invoices')
     .select('id, invoice_number, from_name, to_name, total, currency, created_at, template, state')
